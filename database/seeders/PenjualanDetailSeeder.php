@@ -27,4 +27,3 @@ class PenjualanDetailSeeder extends Seeder
         DB::table('t_penjualan_detail')->insert($data); // Memasukkan data ke tabel t_penjualan_detail
     }
 }
-
