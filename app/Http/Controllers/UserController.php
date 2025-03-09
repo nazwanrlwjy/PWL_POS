@@ -10,9 +10,29 @@ class UserController extends Controller
 {
     public function index()
     {
-        //JS4_2.3
-        $user = UserModel::where('level_id', 2)->count(); // Menghitung jumlah pengguna
-        return view('user', ['data' => $user]); // Mengirim data ke view
+
+        //JS4_2.4
+        $user = UserModel::firstOrNew([
+            'username' => 'manager33',
+            'nama' => 'Manager Tiga Tiga',
+            'password' => Hash::make('12345'),
+            'level_id' => 2
+        ]);
+        $user->save();
+        return view('user', ['data' => $user]);
+        
+        // $user = UserModel::firstOrCreate(
+        //     [
+        //         'username' => 'manager',
+        //         'nama' => 'Manager',
+        //     ],
+        // );
+
+        // return view('user', ['data' => $user]);
+
+        // //JS4_2.3
+        // $user = UserModel::where('level_id', 2)->count(); // Menghitung jumlah pengguna
+        // return view('user', ['data' => $user]); // Mengirim data ke view
         
         // $user = UserModel::where('level_id', 2)->count();
         // dd($user);
