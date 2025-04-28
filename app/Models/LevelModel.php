@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LevelModel extends Model
 {
-    protected $table = 'm_level'; // Pastikan ini sesuai dengan nama tabel di database
+    use HasFactory;
 
-    protected $fillable = ['level_nama'];
+    protected $table = 'm_level'; // Sesuaikan dengan nama tabel di database
+    protected $primaryKey = 'level_id';
 
+    protected $fillable = ['level_id', 'level_kode', 'level_name'];
+
+    // Relasi dengan UserModel
     public function users(): HasMany
     {
-        return $this->hasMany(UserModel::class, 'level_id', 'id'); 
-        // level_id ada di tabel users, bukan di tabel levels
+        return $this->hasMany(UserModel::class, 'level_id', 'level_id');
     }
 }
