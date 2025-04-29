@@ -22,12 +22,20 @@ class UserController extends Controller
 
         $activeMenu = 'user';
 
-        return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
+        $level = LevelModel::all();
+
+        return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
     }
 
     public function list()
     {
-        $users = UserModel::select('user_id', 'username', 'name', 'level_id')->with('level');
+        $users = UserModel::select('user_id', 'username', 'name', 'level_id')
+                    ->with('level');
+        
+        // Filter data user berdasarkan level_id
+        if (request()->level_id) {
+            $users = $users->where('level_id', request()->level_id);
+        }
 
         return DataTables::of($users)
             ->addIndexColumn()
