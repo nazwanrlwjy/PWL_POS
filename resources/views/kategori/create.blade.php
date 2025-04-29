@@ -13,7 +13,7 @@
                 <div class="form-group row">
                     <label class="col-1 control-label col-form-label">Kode Kategori</label>
                     <div class="col-11">
-                        <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" value="{{ old('nama_kategori') }}" required>
+                        <input type="text" class="form-control" kategori_id="nama_kategori" name="nama_kategori" value="{{ old('nama_kategori') }}" required>
                         @error('nama_kategori')
                             <small class="form-text text-danger">{{ $message }}</small>
                         @enderror
@@ -23,7 +23,7 @@
                 <div class="form-group row">
                     <label class="col-1 control-label col-form-label">Nama Kategori</label>
                     <div class="col-11">
-                        <input type="text" class="form-control" id="deskripsi" name="deskripsi" value="{{ old('deskripsi') }}" required>
+                        <input type="text" class="form-control" kategori_id="deskripsi" name="deskripsi" value="{{ old('deskripsi') }}" required>
                         @error('deskripsi')
                             <small class="form-text text-danger">{{ $message }}</small>
                         @enderror

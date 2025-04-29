@@ -30,14 +30,14 @@ class KategoriController extends Controller
 
     public function list()
     {
-        $kategori = KategoriModel::select('id', 'nama_kategori', 'deskripsi');
+        $kategori = KategoriModel::select('kategori_id', 'nama_kategori', 'deskripsi');
         
         return DataTables::of($kategori)
             ->addIndexColumn()
             ->addColumn('aksi', function ($kategori) {
-                $btn = '<a href="'.url('/kategori/' . $kategori->id).'" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="'.url('/kategori/' . $kategori->id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="'. url('/kategori/'.$kategori->id).'">'
+                $btn = '<a href="'.url('/kategori/' . $kategori->kategori_id).'" class="btn btn-info btn-sm">Detail</a> ';
+                $btn .= '<a href="'.url('/kategori/' . $kategori->kategori_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
+                $btn .= '<form class="d-inline-block" method="POST" action="'. url('/kategori/'.$kategori->kategori_id).'">'
                     . csrf_field() . method_field('DELETE') .
                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                 return $btn;
@@ -78,9 +78,9 @@ class KategoriController extends Controller
         return redirect('/kategori')->with('success', 'Data kategori berhasil disimpan');
     }
 
-    public function show($id)
+    public function show($kategori_id)
     {
-        $kategori = KategoriModel::findOrFail($id);
+        $kategori = KategoriModel::findOrFail($kategori_id);
 
         $breadcrumb = (object) [
             'title' => 'Detail Kategori',
@@ -101,9 +101,9 @@ class KategoriController extends Controller
         ]);
     }
 
-    public function edit($id)
+    public function edit($kategori_id)
     {
-        $kategori = KategoriModel::findOrFail($id);
+        $kategori = KategoriModel::findOrFail($kategori_id);
 
         $breadcrumb = (object) [
             'title' => 'Edit Kategori',
@@ -124,22 +124,22 @@ class KategoriController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $kategori_id)
     {
         $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:m_kategori,nama_kategori,'.$id.',id',
+            'nama_kategori' => 'required|string|max:255|unique:m_kategori,nama_kategori,'.$kategori_id.',kategori_id',
             'deskripsi' => 'required|string|max:255'
         ]);
 
-        $kategori = KategoriModel::findOrFail($id);
+        $kategori = KategoriModel::findOrFail($kategori_id);
         $kategori->update($request->all());
 
         return redirect('/kategori')->with('success', 'Data kategori berhasil diperbarui');
     }
 
-    public function destroy($id)
+    public function destroy($kategori_id)
     {
-        $kategori = KategoriModel::find($id);
+        $kategori = KategoriModel::find($kategori_id);
         if (!$kategori) {
             return redirect('/kategori')->with('error', 'Data kategori tidak ditemukan');
         }

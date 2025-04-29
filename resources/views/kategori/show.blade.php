@@ -16,7 +16,7 @@
                 <table class="table table-bordered table-striped table-hover table-sm">
                     <tr>
                         <th>ID</th>
-                        <td>{{ $kategori->id }}</td>
+                        <td>{{ $kategori->kategori_id }}</td>
                     </tr>
                     <tr>
                         <th>Kode Kategori</th>
