@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
    
     Route::get('/', [WelcomeController::class, 'index']);
     
-    Route::group(['prefix' => 'user'], function () {
+        Route::middleware(['authorize:ADM'])->prefix('user')->group(function (){
         Route::get('/', [UserController::class, 'index']);       // menampilkan halaman awal user
         Route::post('/list', [UserController::class, 'list']);    // menampilkan data user dalam bentuk json untuk datatables
         Route::get('/create', [UserController::class, 'create']);// menampilkan halaman form tambah user
@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [UserController::class, 'destroy']);// menghapus data user
     });
     
-    Route::group(['prefix' => 'level'], function () {
+        Route::middleware(['authorize:ADM'])->prefix('level')->group(function (){
         Route::get('/', [LevelController::class, 'index']);       // menampilkan halaman awal level
         Route::post('/list', [LevelController::class, 'list']);    // menampilkan data level dalam bentuk json untuk datatables
         Route::get('/create', [LevelController::class, 'create']);// menampilkan halaman form tambah level
@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [LevelController::class, 'destroy']);// menghapus data level
     });
     
-    Route::group(['prefix' => 'kategori'], function () {
+        Route::middleware(['authorize:ADM'])->prefix('kategori')->group(function (){
         Route::get('/', [KategoriController::class, 'index']);
         Route::post('/list', [KategoriController::class, 'list']);
         Route::get('/create', [KategoriController::class, 'create']);
@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [KategoriController::class, 'destroy']);
     });
     
-    Route::group(['prefix' => 'supplier'], function () {
+        Route::middleware(['authorize:ADM, MNG'])->prefix('supplier')->group(function (){
         Route::get('/', [SupplierController::class, 'index']);
         Route::post('/list', [SupplierController::class, 'list']);
         Route::get('/create', [SupplierController::class, 'create']);
@@ -88,7 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [SupplierController::class, 'destroy']);
     });
     
-    Route::group(['prefix' => 'barang'], function () {
+        Route::middleware(['authorize:ADM, MNG'])->prefix('barang')->group(function (){
         Route::get('/', [BarangController::class, 'index']);
         Route::post('/list', [BarangController::class, 'list']);
         Route::get('/create', [BarangController::class, 'create']);
@@ -104,17 +104,5 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/{id}', [BarangController::class, 'destroy']);
     });
-
-
-    Route::middleware(['authorize:ADM'])->group(function () {
-        Route::get('/level', [LevelController::class, 'index']);
-        Route::post('/level/list', [LevelController::class, 'list']);       // untuk list json datatables
-        Route::get('/level/create', [LevelController::class, 'create']);
-        Route::post('/level', [LevelController::class, 'store']);
-        Route::get('/level/{id}/edit', [LevelController::class, 'edit']);   // untuk tampilkan form edit
-        Route::put('/level/{id}', [LevelController::class, 'update']);      // untuk proses update data
-        Route::delete('/level/{id}', [LevelController::class, 'destroy']);  // untuk proses hapus data
-    });
-
 
 });    
