@@ -15,6 +15,8 @@ Route::pattern('id', '[0-9]+');
 Route::get('login', [AuthController::class, 'login'])->name('login'); // menampilkan halaman login
 Route::post('login', [AuthController::class, 'postlogin']); // proses login
 Route::get('logout', [AuthController::class, 'logout'])->middleware('auth'); // proses logout
+Route::get('/register', [AuthController::class, 'register'])->name('register.form');
+Route::post('/register', [AuthController::class, 'store_user'])->name('register.store');
 
 Route::middleware('auth')->group(function () {
    
