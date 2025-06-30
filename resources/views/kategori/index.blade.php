@@ -5,61 +5,81 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
+                <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-sm btn-info mt-1">Import Kategori</button>
                 <a class="btn btn-sm btn-primary mt-1" href="{{ url('kategori/create') }}">Tambah</a>
-                <button onclick="modalAction('{{ url('kategori/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                <button onclick="modalAction('{{ url('/kategori/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
+                Ajax</button>
             </div>
         </div>
         <div class="card-body">
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
-
             @if (session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-
-            <table class="table table-bordered table-striped table-hover table-sm" id="table_kategori">
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Kode Kategori</th>
-                        <th>Nama Kategori</th>
+                        <th>KategoriKode</th>
+                        <th>KategoriNama</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
             </table>
         </div>
-        <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
     </div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+    data-keyboard="false" data-width="75%" aria-hidden="true">
 @endsection
-
 @push('css')
 @endpush
-
 @push('js')
-<script>
-    function modalAction(url = '') {
-        $('#myModal').load(url, function(){
-            $('#myModal').modal('show');
+    <script>
+            function modalAction(url = '') {
+                $('#myModal').load(url, function() {
+                    $('#myModal').modal('show');
+                });
+            }
+        $(document).ready(function() {
+            var dataUser = $('#table_level').DataTable({
+                processing: true,
+                serverSide: true, // Jika ingin menggunakan server-side processing
+                ajax: {
+                    "url": "{{ url('kategori/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": function(d) {
+                        d.kategori_id = $('#kategori_id').val();
+                    }
+                },
+                columns: [{
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    }, // Kolom nomor urut
+                    {
+                        data: "nama_kategori",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "deskripsi",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "aksi",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    } // Tombol aksi
+                ]
+            });
         });
-    }
-
-    var dataKategori;
-    $(document).ready(function() {
-        dataKategori = $('#table_kategori').DataTable({
-            serverSide: true,
-            ajax: {
-                "url": "{{ url('kategori/list') }}",
-                "dataType": "json",
-                "type": "POST"
-            },
-            columns: [
-                { data: "DT_RowIndex", className: "text-center", orderable: false, searchable: false },
-                { data: "nama_kategori", className: "", orderable: true, searchable: true },
-                { data: "deskripsi", className: "", orderable: true, searchable: true },
-                { data: "aksi", className: "text-center", orderable: false, searchable: false }
-            ]
-        });
-    });
-</script>
+    </script>
 @endpush
