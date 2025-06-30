@@ -339,4 +339,52 @@ public function import_ajax(Request $request)
     return redirect('/');
 }
 
+    public function export_excel()
+{
+    $levels = LevelModel::select('level_kode', 'level_name')
+        ->orderBy('level_kode')
+        ->get();
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Header kolom
+    $sheet->setCellValue('A1', 'No');
+    $sheet->setCellValue('B1', 'Kode Level');
+    $sheet->setCellValue('C1', 'name Level');
+
+    $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+
+    $no = 1;
+    $baris = 2;
+    foreach ($levels as $level) {
+        $sheet->setCellValue('A' . $baris, $no);
+        $sheet->setCellValue('B' . $baris, $level->level_kode);
+        $sheet->setCellValue('C' . $baris, $level->level_name);
+        $baris++;
+        $no++;
+    }
+
+    // Auto width kolom
+    foreach (range('A', 'C') as $columnID) {
+        $sheet->getColumnDimension($columnID)->setAutoSize(true);
+    }
+
+    $sheet->setTitle('Data Level');
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $filename = 'Data_Level_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+    // Header untuk download file
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: cache, must-revalidate');
+    header('Pragma: public');
+
+    $writer->save('php://output');
+    exit;
+}
+
 }

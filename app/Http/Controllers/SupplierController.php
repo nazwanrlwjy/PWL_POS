@@ -326,4 +326,57 @@ class SupplierController extends Controller
 
         return redirect('/');
     }
+
+    public function export_excel()
+{
+    $suppliers = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_telp', 'supplier_alamat')
+        ->orderBy('supplier_kode')
+        ->get();
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Header kolom
+    $sheet->setCellValue('A1', 'No');
+    $sheet->setCellValue('B1', 'Kode Supplier');
+    $sheet->setCellValue('C1', 'Nama Supplier');
+    $sheet->setCellValue('D1', 'Telepon');
+    $sheet->setCellValue('E1', 'Alamat');
+
+    $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+    $no = 1;
+    $baris = 2;
+    foreach ($suppliers as $supplier) {
+        $sheet->setCellValue('A' . $baris, $no);
+        $sheet->setCellValue('B' . $baris, $supplier->supplier_kode);
+        $sheet->setCellValue('C' . $baris, $supplier->supplier_nama);
+        $sheet->setCellValue('D' . $baris, $supplier->supplier_telp);
+        $sheet->setCellValue('E' . $baris, $supplier->supplier_alamat);
+        $baris++;
+        $no++;
+    }
+
+    // Atur kolom agar otomatis menyesuaikan lebar isi
+    foreach (range('A', 'E') as $columnID) {
+        $sheet->getColumnDimension($columnID)->setAutoSize(true);
+    }
+
+    $sheet->setTitle('Data Supplier');
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $filename = 'Data_Supplier_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+    // Header untuk proses download
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: cache, must-revalidate');
+    header('Pragma: public');
+
+    $writer->save('php://output');
+    exit;
+}
+
 }
