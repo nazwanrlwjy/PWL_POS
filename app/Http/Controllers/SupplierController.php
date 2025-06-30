@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\SupplierModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SupplierController extends Controller
 {
@@ -246,6 +247,83 @@ class SupplierController extends Controller
                 ]);
             }
         }
+        return redirect('/');
+    }
+    public function import()
+    {
+        return view('supplier.import'); // Membuat view supplier/import.blade.php
+    }
+
+    // Proses import data supplier via AJAX
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi file
+            $rules = [
+                'file_supplier' => ['required', 'mimes:xlsx', 'max:1024'] // max 1MB
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_supplier');
+
+            // Membaca file Excel menggunakan PhpSpreadsheet
+            $reader = IOFactory::createReader('Xlsx');
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Mengambil data sheet dalam bentuk array
+            $data = $sheet->toArray(null, false, true, true); // hasil array ['A' => kode, 'B' => nama, 'C' => alamat, ...]
+
+            $insert = [];
+
+            // Memproses data kecuali baris pertama (header)
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // Lewati baris header
+                        if (!empty($value['A']) && !empty($value['B']) && !empty($value['C']) && !empty($value['D'])) { // Pastikan semua kolom ada isinya
+                            $insert[] = [
+                                'supplier_kode' => trim($value['A']),
+                                'supplier_nama' => trim($value['B']),
+                                'supplier_telp' => trim($value['C']),
+                                'supplier_alamat'=> trim($value['D']),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ];
+                        }
+                    }
+                }
+
+                // Menyimpan data supplier ke database
+                if (count($insert) > 0) {
+                    SupplierModel::insertOrIgnore($insert); // Insert data tanpa duplikasi
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data supplier berhasil diimport'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data kosong atau tidak valid'
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data dalam file'
+                ]);
+            }
+        }
+
         return redirect('/');
     }
 }

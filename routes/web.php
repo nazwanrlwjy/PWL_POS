@@ -82,24 +82,23 @@ Route::middleware('auth')->group(function () {
     });
     
     
-        Route::middleware(['authorize:ADM, MNG'])->prefix('supplier')->group(function (){
-        Route::get('/', [SupplierController::class, 'index']);
-        Route::post('/list', [SupplierController::class, 'list']);
-        Route::get('/create', [SupplierController::class, 'create']);
-        Route::post('/', [SupplierController::class, 'store']);
-        Route::get('/create_ajax', [SupplierController::class, 'create_ajax']);
-        Route::post('/ajax', [SupplierController::class, 'store_ajax']);
-        Route::get('/{id}', [SupplierController::class, 'show']);
-        Route::get('/{id}/edit', [SupplierController::class, 'edit']);
-        Route::put('/{id}', [SupplierController::class, 'update']);
-        Route::get('/{id}/edit_ajax', [SupplierController::class, 'edit_ajax']);
-        Route::put('/{id}/update_ajax', [SupplierController::class, 'update_ajax']);
-        Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']);
-        Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']);
-        Route::delete('/{id}', [SupplierController::class, 'destroy']);
-        Route::get('import', [SupplierController::class, 'import']);
-        Route::post('import_ajax', [SupplierController::class, 'import_ajax']);
-        Route::get('export_excel', [SupplierController::class, 'export_excel']);
+    Route::middleware(['authorize:MNG,ADM'])->prefix('supplier')->group(function () {
+        Route::get('/',[SupplierController::class,'index']);//menampilkan halaman awal
+        Route::post('/list',[SupplierController::class,'list']);//menampilkan data user bentuk json / datatables
+        Route::get('/create',[SupplierController::class,'create']);// meanmpilkan bentuk form untuk tambah user
+        Route::post('/',[SupplierController::class,'store']);//menyimpan user data baru 
+        Route::get('/create_ajax',[SupplierController::class,'create_ajax']);// meanmpilkan bentuk form untuk tambah user
+        Route::post('/ajax',[SupplierController::class,'store_ajax']);//menyimpan user data baru 
+        Route::get('/{id}',[SupplierController::class,'show']); // menampilkan detil user
+        Route::get('/{id}/edit',[SupplierController::class,'edit']);// menampilkan halaman form edit user
+        Route::put('/{id}',[SupplierController::class,'update']);// menyimpan perubahan data user 
+        Route::get('/{id}/edit_ajax',[SupplierController::class,'edit_ajax']);// menampilkan halaman form edit user
+        Route::put('/{id}/update_ajax',[SupplierController::class,'update_ajax']);// menyimpan perubahan data user 
+        Route::get('/{id}/delete_ajax',[SupplierController::class,'confirm_ajax']);// menghapus data user 
+        Route::delete('/{id}/delete_ajax',[SupplierController::class,'delete_ajax']);// menghapus data user 
+        Route::delete('/{id}',[SupplierController::class,'destroy']);// menghapus data user 
+        Route::get('/import',[SupplierController::class,'import']); // ajax form upload excel
+        Route::post('/import_ajax',[SupplierController::class,'import_ajax']); // ajax form import excel 
     });
     
         Route::middleware(['authorize:ADM, MNG'])->prefix('barang')->group(function (){
