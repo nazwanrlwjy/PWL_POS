@@ -6,6 +6,7 @@ use App\Models\LevelModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory; 
 
 class LevelController extends Controller
 {
@@ -266,4 +267,76 @@ class LevelController extends Controller
         }
         return redirect('/');
     }
+
+// Tampilkan halaman import
+public function import()
+{
+    return view('level.import'); // buat file view bername level/import.blade.php
+}
+
+// Proses import data via AJAX
+public function import_ajax(Request $request)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        $rules = [
+            'file_level' => ['required', 'mimes:xlsx', 'max:1024'] // max 1MB
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi Gagal',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        $file = $request->file('file_level');
+
+        $reader = IOFactory::createReader('Xlsx');
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $data = $sheet->toArray(null, false, true, true); // hasil array ['A' => kode, 'B' => name]
+
+        $insert = [];
+
+        if (count($data) > 1) {
+            foreach ($data as $baris => $value) {
+                if ($baris > 1) { // Lewati baris header
+                    if (!empty($value['A']) && !empty($value['B'])) {
+                        $insert[] = [
+                            'level_kode' => trim($value['A']),
+                            'level_name' => trim($value['B']),
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+            }
+
+            if (count($insert) > 0) {
+                LevelModel::insertOrIgnore($insert);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data kosong atau tidak valid'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak ada data dalam file'
+            ]);
+        }
+    }
+
+    return redirect('/');
+}
+
 }

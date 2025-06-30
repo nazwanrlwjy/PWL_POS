@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);// menampilkan halaman form edit level
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']);  // menyimpan perubahan data level
         Route::delete('/{id}', [LevelController::class, 'destroy']);// menghapus data level
+        Route::get('import', [LevelController::class, 'import']);
+        Route::post('import_ajax', [LevelController::class, 'import_ajax']);
     });
     
         Route::middleware(['authorize:ADM'])->prefix('kategori')->group(function (){
