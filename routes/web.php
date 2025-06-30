@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/delete_ajax', [UserController::class, 'confirm_ajax']);// menampilkan halaman form confirm delete user ajax
         Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']);  // untuk hapus data user ajax
         Route::delete('/{id}', [UserController::class, 'destroy']);// menghapus data user
+        Route::get('import', [UserController::class, 'import']);
+        Route::post('import_ajax', [UserController::class, 'import_ajax']);
     });
     
         Route::middleware(['authorize:ADM'])->prefix('level')->group(function (){

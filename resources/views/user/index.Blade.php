@@ -4,10 +4,11 @@
      <div class="card card-outline card-primary">
          <div class="card-header">
               <h3 class="card-title">{{ $page->title }}</h3>
-              <div class="card-tools">
-                 <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
-                 <button onclick="modalAction('{{url('user/create_ajax')}}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
-             </div>
+                <div class="card-tools">
+                    <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info">Import User</button>
+                    <a href="{{ url('/user/create') }}" class="btn btn-primary">Tambah Data</a>
+                    <button onclick="modalAction('{{ url('/user/create_ajax') }}')" class="btn btn-success">Tambah Data (Ajax)</button>
+                </div>
          </div>
             <div class="card-body">
                 @if (session('success'))
@@ -62,6 +63,7 @@
          $(document).ready(function() {
              dataUser = $('#table_user').DataTable({
              // serverSide: true, jika ingin menggunakan server side processing 
+             processing: true,
              serverSide: true,
              ajax: {
              "url": "{{ url('user/list') }}",
@@ -93,7 +95,9 @@
              },{
              // mengambil data level hasil dari ORM berelasi 
              data: "level.level_name",
-             className: "", orderable: false, searchable: false
+             className: "", 
+             orderable: false, 
+             searchable: false
              },{
              data: "aksi",
              className: "", 
@@ -102,9 +106,17 @@
              }
              ]
              });
-             $('#level_id').on('change', function() {
-                 dataUser.ajax.reload();
-             });
+                     // Filter level
+        $('#filter_level').change(function () {
+            tableUser.ajax.reload();
+        });
+
+        // Enter search manual
+        $('#table-user_filter input').unbind().bind('keyup', function (e) {
+            if (e.keyCode === 13) {
+                tableUser.search(this.value).draw();
+            }
+        });
          });
  </script> 
  @endpush
