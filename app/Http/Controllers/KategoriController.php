@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KategoriController extends Controller
 {
@@ -335,8 +336,8 @@ class KategoriController extends Controller
 
     // Header kolom
     $sheet->setCellValue('A1', 'No');
-    $sheet->setCellValue('B1', 'Nama Kategori');
-    $sheet->setCellValue('C1', 'Deskripsi');
+    $sheet->setCellValue('B1', 'Kode Kategori');
+    $sheet->setCellValue('C1', 'Nama Kategori');
 
     $sheet->getStyle('A1:C1')->getFont()->setBold(true);
 
@@ -370,6 +371,22 @@ class KategoriController extends Controller
 
     $writer->save('php://output');
     exit;
+}
+
+    public function export_pdf()
+{
+    ini_set('max_execution_time', 300); // Tambah waktu maksimal jadi 5 menit
+
+    $kategori = KategoriModel::select('nama_kategori', 'deskripsi')
+        ->orderBy('nama_kategori')
+        ->get();
+
+    $pdf = Pdf::loadView('kategori.export_pdf', ['kategori' => $kategori]);
+    $pdf->setPaper('a4', 'portrait');
+    $pdf->setOption(['isRemoteEnabled' => true]);
+    $pdf->render();
+
+    return $pdf->stream('Data Kategori ' . date('Y-m-d H:i:s') . '.pdf');
 }
 
 }

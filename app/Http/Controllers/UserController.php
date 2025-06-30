@@ -8,6 +8,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -432,5 +433,35 @@ public function update_ajax(Request $request, $id){
     $writer->save('php://output');
     exit;
 }
+
+public function export_pdf()
+{
+    ini_set('max_execution_time', 300); // Tambah waktu maksimal jadi 5 menit
+
+    // Ambil data user dengan relasi level
+    $users = UserModel::select('level_id', 'username', 'name')
+        ->with('level') // pastikan ada relasi level()
+        ->orderBy('name')
+        ->get();
+
+    // Pastikan data ditemukan
+    if ($users->isEmpty()) {
+        return response()->json(['message' => 'Tidak ada data untuk diekspor'], 404);
+    }
+
+    // Load view untuk PDF
+    $pdf = Pdf::loadView('user.export_pdf', ['users' => $users]);
+
+    // Atur paper size dan orientasi
+    $pdf->setPaper('a4', 'portrait');
+
+    // Pengaturan tambahan untuk memastikan gambar atau konten remote dapat dimuat
+    $pdf->setOption('isHtml5ParserEnabled', true);
+    $pdf->setOption('isPhpEnabled', true);
+
+    // Render PDF dan stream
+    return $pdf->stream('Data_User_' . date('Y-m-d_H-i-s') . '.pdf');
+}
+
 
 }

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SupplierModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -377,6 +378,21 @@ class SupplierController extends Controller
 
     $writer->save('php://output');
     exit;
+}
+
+
+public function export_pdf()
+{
+    ini_set('max_execution_time', 300); // tambah waktu maksimal jadi 5 menit
+
+    $supplier = SupplierModel::orderBy('supplier_kode')->get();
+
+    $pdf = Pdf::loadView('supplier.export_pdf', ['supplier' => $supplier]);
+    $pdf->setPaper('a4', 'portrait');
+    $pdf->setOption(['isRemoteEnabled' => true]);
+    $pdf->render();
+
+    return $pdf->stream('Data Supplier ' . date('Y-m-d H:i:s') . '.pdf');
 }
 
 }

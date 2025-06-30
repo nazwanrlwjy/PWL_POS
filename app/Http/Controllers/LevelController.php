@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory; 
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LevelController extends Controller
 {
@@ -386,5 +387,25 @@ public function import_ajax(Request $request)
     $writer->save('php://output');
     exit;
 }
+
+    public function export_pdf()
+{
+    ini_set('max_execution_time', 300); // tambah waktu maksimal jadi 5 menit
+
+    // Ambil data level dari database
+    $levels = LevelModel::select('level_kode', 'level_name')
+        ->orderBy('level_kode')
+        ->get();
+
+    // Buat PDF dari view
+    $pdf = Pdf::loadView('level.export_pdf', ['levels' => $levels]);
+    $pdf->setPaper('a4', 'portrait');
+    $pdf->setOption(['isRemoteEnabled' => true]);
+    $pdf->render();
+
+    // Stream hasil PDF
+    return $pdf->stream('Data_Level_' . date('Y-m-d_H-i-s') . '.pdf');
+}
+
 
 }
